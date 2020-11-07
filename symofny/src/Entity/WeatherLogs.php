@@ -32,6 +32,11 @@ class WeatherLogs
      */
     private $AtmosphericPressure;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $timestamp;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class WeatherLogs
     public function setAtmosphericPressure(?string $AtmosphericPressure): self
     {
         $this->AtmosphericPressure = $AtmosphericPressure;
+
+        return $this;
+    }
+
+    public function getTimestamp(): ?\DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(?\DateTimeInterface $dateTime): self
+    {
+        $this->timestamp = $dateTime;
 
         return $this;
     }

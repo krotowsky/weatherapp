@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\WeatherLogs;
+use DateInterval;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,9 +16,36 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class WeatherLogsRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+//    public function __construct(ManagerRegistry $registry)
+//    {
+//        parent::__construct($registry, WeatherLogs::class);
+//    }
+
+    private $manager;
+
+    public function __construct(ManagerRegistry $registry,EntityManagerInterface $manager){
         parent::__construct($registry, WeatherLogs::class);
+        $this->manager = $manager;
+    }
+
+    public function save($type,$data){
+        $dateTime = new \DateTime('now');
+        $dateTime->sub(new DateInterval('PT1H'));
+        $NewLog =new WeatherLogs();
+        switch ($type) {
+            case "temp":
+                $NewLog->setTemperatureC($data);
+                break;
+            case "hum":
+                $NewLog->setHumidity($data);
+                break;
+            case "press":
+                $NewLog->setAtmosphericPressure($data);
+                break;
+        }
+        $NewLog->setTimestamp($dateTime);
+        $this->manager->persist($NewLog);
+        $this->manager->flush();
     }
 
     // /**
