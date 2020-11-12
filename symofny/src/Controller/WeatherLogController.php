@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 
+use App\Service\PowerBiDataPusher;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -15,8 +16,9 @@ class WeatherLogController
 {
 
     private $weatherLogsRepository;
+    private $powerBiDataPusher;
 
-    public function __construct(WeatherLogsRepository $weatherLogsRepository){
+    public function __construct(WeatherLogsRepository $weatherLogsRepository, PowerBiDataPusher $powerBiDataPusher){
         $this->weatherLogsRepository = $weatherLogsRepository;
     }
 
@@ -24,9 +26,10 @@ class WeatherLogController
      * @Route("/weather/{type}", name="log_state", methods={"POST"})
      * @param Request $request
      * @param $type
+     * @param PowerBiDataPusher $powerBiDataPusher
      * @return JsonResponse
      */
-    public function logTemp(Request $request, $type){
+    public function logTemp(Request $request, $type, PowerBiDataPusher $powerBiDataPusher){
 
         $data = json_decode($request->getContent(),true);
         $datalog = $data['data'];
@@ -36,6 +39,8 @@ class WeatherLogController
         }
 
         $this->weatherLogsRepository->save($type,$datalog);
-        return new JsonResponse(['status' => 'Log created!'], Response::HTTP_CREATED);
+        //$request = $powerBiDataPusher->publishData($datalog,$type);
+
+        return new JsonResponse($request, Response::HTTP_CREATED);
     }
 }
